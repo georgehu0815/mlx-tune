@@ -7,7 +7,7 @@ name = "mlx-tune"
 version = "0.4.7"
 description = "MLX-powered LLM/VLM/TTS/STT fine-tuning for Apple Silicon - Unsloth-compatible API for Mac"
 readme = "README.md"
-requires-python = ">=3.9"
+requires-python = ">=3.12"
 license = {text = "Apache-2.0"}
 authors = [
     {name = "MLX-Tune Contributors"}
@@ -36,6 +36,8 @@ dependencies = [
     "huggingface-hub>=0.20.0",
     "numpy>=1.23.0",
     "tqdm>=4.65.0",
+    "torch==2.11.0",
+    "torchvision==0.26.0"
 ]
 
 [project.optional-dependencies]

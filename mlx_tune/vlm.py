@@ -30,6 +30,33 @@ import warnings
 import json
 
 
+# Monkey-patch: Qwen2/3VL fast image processor only supports return_tensors="pt",
+# but mlx-vlm passes return_tensors="mlx". Intercept at the image processor level,
+# force "pt", then convert resulting PT tensors to numpy for mx.array() compatibility.
+try:
+    from transformers.models.qwen2_vl.image_processing_qwen2_vl_fast import (
+        Qwen2VLImageProcessorFast,
+    )
+
+    _orig_qwen2vl_preprocess = Qwen2VLImageProcessorFast.preprocess
+
+    def _patched_qwen2vl_preprocess(self, images, **kwargs):
+        if kwargs.get("return_tensors") == "mlx":
+            kwargs = {**kwargs, "return_tensors": "pt"}
+            result = _orig_qwen2vl_preprocess(self, images, **kwargs)
+            # Convert PT tensors to numpy so mx.array() can consume them
+            for key in list(result.keys()):
+                val = result[key]
+                if hasattr(val, "numpy"):
+                    result[key] = val.detach().numpy()
+            return result
+        return _orig_qwen2vl_preprocess(self, images, **kwargs)
+
+    Qwen2VLImageProcessorFast.preprocess = _patched_qwen2vl_preprocess
+except (ImportError, AttributeError):
+    pass
+
+
 # Check for mlx-vlm availability
 # Supports both mlx-vlm >=0.4.0 (new API) and 0.3.x (legacy API)
 _MLX_VLM_LEGACY = False  # True if using 0.3.x API
