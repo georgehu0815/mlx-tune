@@ -30,6 +30,27 @@ import warnings
 import json
 
 
+# Patch for transformers 5.x bug: AutoVideoProcessor.from_pretrained raises
+# TypeError("argument of type 'NoneType' is not iterable") when the video
+# processor mapping has None entries for newer model types like qwen3_5.
+# Patching the classmethod directly since the internal helper isn't reachable
+# via module-level attribute replacement.
+try:
+    from transformers.models.auto.video_processing_auto import AutoVideoProcessor as _AVP
+    _orig_avp_from_pretrained = _AVP.from_pretrained
+
+    @classmethod  # type: ignore[misc]
+    def _safe_avp_from_pretrained(cls, *args, **kwargs):
+        try:
+            return _orig_avp_from_pretrained.__func__(cls, *args, **kwargs)
+        except TypeError:
+            return None
+
+    _AVP.from_pretrained = _safe_avp_from_pretrained
+except (ImportError, AttributeError):
+    pass
+
+
 # Check for mlx-vlm availability
 # Supports both mlx-vlm >=0.4.0 (new API) and 0.3.x (legacy API)
 _MLX_VLM_LEGACY = False  # True if using 0.3.x API

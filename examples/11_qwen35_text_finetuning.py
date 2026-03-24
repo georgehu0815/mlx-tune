@@ -12,26 +12,31 @@ Usage:
     python examples/11_qwen35_text_finetuning.py
 """
 
-from mlx_tune import FastVisionModel, UnslothVisionDataCollator, VLMSFTTrainer
+from mlx_tune import FastLanguageModel,FastVisionModel, UnslothVisionDataCollator, VLMSFTTrainer
 from mlx_tune.vlm import VLMSFTConfig
 
 # ===========================================================================
 # Step 1: Load Qwen3.5
 # ===========================================================================
-print("=" * 70)
-print("Step 1: Loading Qwen3.5-0.8B (natively multimodal)")
-print("=" * 70)
+print("= - 11_qwen35_text_finetuning.py:21" * 70)
+print("Step 1: Loading Qwen3.50.8B (natively multimodal) - 11_qwen35_text_finetuning.py:22")
+print("= - 11_qwen35_text_finetuning.py:23" * 70)
 
 model, processor = FastVisionModel.from_pretrained(
     "mlx-community/Qwen3.5-0.8B-8bit",  # or bf16 for better quality
 )
+# from mlx_tune import FastLanguageModel
 
+# model, tokenizer = FastLanguageModel.from_pretrained(
+#     model_name="Qwen/Qwen3.5-7B",
+#     max_seq_length=2048,
+# )
 # ===========================================================================
 # Step 2: Add LoRA (language layers only — no vision fine-tuning needed)
 # ===========================================================================
-print("\n" + "=" * 70)
-print("Step 2: Adding LoRA Adapters (language only)")
-print("=" * 70)
+print("\n - 11_qwen35_text_finetuning.py:37" + "=" * 70)
+print("Step 2: Adding LoRA Adapters (language only) - 11_qwen35_text_finetuning.py:38")
+print("= - 11_qwen35_text_finetuning.py:39" * 70)
 
 model = FastVisionModel.get_peft_model(
     model,
@@ -49,9 +54,9 @@ model = FastVisionModel.get_peft_model(
 # ===========================================================================
 # Step 3: Prepare text-only dataset
 # ===========================================================================
-print("\n" + "=" * 70)
-print("Step 3: Preparing Text-Only Dataset")
-print("=" * 70)
+print("\n - 11_qwen35_text_finetuning.py:57" + "=" * 70)
+print("Step 3: Preparing TextOnly Dataset - 11_qwen35_text_finetuning.py:58")
+print("= - 11_qwen35_text_finetuning.py:59" * 70)
 
 # Format: same as vision, just without {"type": "image"} entries
 # You can also load from HuggingFace:
@@ -101,14 +106,14 @@ dataset = [
     ]},
 ]
 
-print(f"Dataset: {len(dataset)} text-only samples (no images)")
+print(f"Dataset: {len(dataset)} textonly samples (no images) - 11_qwen35_text_finetuning.py:109")
 
 # ===========================================================================
 # Step 4: Test inference BEFORE training
 # ===========================================================================
-print("\n" + "=" * 70)
-print("Step 4: Pre-Training Inference Test")
-print("=" * 70)
+print("\n - 11_qwen35_text_finetuning.py:114" + "=" * 70)
+print("Step 4: PreTraining Inference Test - 11_qwen35_text_finetuning.py:115")
+print("= - 11_qwen35_text_finetuning.py:116" * 70)
 
 FastVisionModel.for_inference(model)
 
@@ -120,15 +125,15 @@ questions = [
 
 for q in questions:
     response = model.generate(prompt=q, max_tokens=64, temperature=0.0)
-    print(f"\nQ: {q}")
-    print(f"A: {response}")
+    print(f"\nQ: {q} - 11_qwen35_text_finetuning.py:128")
+    print(f"A: {response} - 11_qwen35_text_finetuning.py:129")
 
 # ===========================================================================
 # Step 5: Train
 # ===========================================================================
-print("\n" + "=" * 70)
-print("Step 5: Training (text-only)")
-print("=" * 70)
+print("\n - 11_qwen35_text_finetuning.py:134" + "=" * 70)
+print("Step 5: Training (textonly) - 11_qwen35_text_finetuning.py:135")
+print("= - 11_qwen35_text_finetuning.py:136" * 70)
 
 FastVisionModel.for_training(model)
 
@@ -147,17 +152,17 @@ trainer = VLMSFTTrainer(
 )
 
 trainer_stats = trainer.train()
-print(f"\nTraining metrics: {trainer_stats.metrics}")
+print(f"\nTraining metrics: {trainer_stats.metrics} - 11_qwen35_text_finetuning.py:155")
 
 # ===========================================================================
 # Step 6: Test inference AFTER training
 # ===========================================================================
-print("\n" + "=" * 70)
-print("Step 6: Post-Training Inference Test")
-print("NOTE: With only 20 steps on 10 samples, the model overfits to the")
-print("training data. Answers will be short and match the training format.")
-print("For real results, use a larger dataset and more training steps.")
-print("=" * 70)
+print("\n - 11_qwen35_text_finetuning.py:160" + "=" * 70)
+print("Step 6: PostTraining Inference Test - 11_qwen35_text_finetuning.py:161")
+print("NOTE: With only 20 steps on 10 samples, the model overfits to the - 11_qwen35_text_finetuning.py:162")
+print("training data. Answers will be short and match the training format. - 11_qwen35_text_finetuning.py:163")
+print("For real results, use a larger dataset and more training steps. - 11_qwen35_text_finetuning.py:164")
+print("= - 11_qwen35_text_finetuning.py:165" * 70)
 
 FastVisionModel.for_inference(model)
 
@@ -169,15 +174,15 @@ questions = [
 
 for q in questions:
     response = model.generate(prompt=q, max_tokens=64, temperature=0.0)
-    print(f"\nQ: {q}")
-    print(f"A: {response}")
+    print(f"\nQ: {q} - 11_qwen35_text_finetuning.py:177")
+    print(f"A: {response} - 11_qwen35_text_finetuning.py:178")
 
 # ===========================================================================
 # Step 7: Save adapters
 # ===========================================================================
-print("\n" + "=" * 70)
-print("Step 7: Saving Adapters")
-print("=" * 70)
+print("\n - 11_qwen35_text_finetuning.py:183" + "=" * 70)
+print("Step 7: Saving Adapters - 11_qwen35_text_finetuning.py:184")
+print("= - 11_qwen35_text_finetuning.py:185" * 70)
 
 model.save_pretrained("qwen35_text_lora")
 
@@ -185,14 +190,14 @@ model.save_pretrained("qwen35_text_lora")
 import os
 for f in sorted(os.listdir("qwen35_text_lora")):
     size = os.path.getsize(f"qwen35_text_lora/{f}")
-    print(f"  {f} ({size:,} bytes)")
+    print(f"{f} ({size:,} bytes) - 11_qwen35_text_finetuning.py:193")
 
 # ===========================================================================
 # Step 8: Load saved adapters into a fresh model
 # ===========================================================================
-print("\n" + "=" * 70)
-print("Step 8: Loading Saved Adapters (verify save/load roundtrip)")
-print("=" * 70)
+print("\n - 11_qwen35_text_finetuning.py:198" + "=" * 70)
+print("Step 8: Loading Saved Adapters (verify save/load roundtrip) - 11_qwen35_text_finetuning.py:199")
+print("= - 11_qwen35_text_finetuning.py:200" * 70)
 
 model2, processor2 = FastVisionModel.from_pretrained(
     "mlx-community/Qwen3.5-0.8B-8bit",
@@ -203,9 +208,9 @@ FastVisionModel.for_inference(model2)
 
 for q in questions:
     response = model2.generate(prompt=q, max_tokens=64, temperature=0.0)
-    print(f"\nQ: {q}")
-    print(f"A: {response}")
+    print(f"\nQ: {q} - 11_qwen35_text_finetuning.py:211")
+    print(f"A: {response} - 11_qwen35_text_finetuning.py:212")
 
-print("\n" + "=" * 70)
-print("Done! Text-only fine-tuning of Qwen3.5 complete.")
-print("=" * 70)
+print("\n - 11_qwen35_text_finetuning.py:214" + "=" * 70)
+print("Done! Textonly finetuning of Qwen3.5 complete. - 11_qwen35_text_finetuning.py:215")
+print("= - 11_qwen35_text_finetuning.py:216" * 70)
